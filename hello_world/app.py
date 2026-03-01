@@ -27,9 +27,10 @@ def lambda_handler(event, context):
     """
 
     bucket = event['Records'][0]['s3']['bucket']['name']
-    object = event['Records'][0]['s3']['object']['key']
+    object_key = event['Records'][0]['s3']['object']['key']
     print(bucket)
-    print(object)
+    print(object_key)
+
 
     # try:
     #     ip = requests.get("http://checkip.amazonaws.com/")
