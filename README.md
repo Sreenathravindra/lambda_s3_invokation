@@ -34,12 +34,12 @@ This project implements a serverless solution that:
 
 ## Features
 
-✔ Event-driven architecture
-✔ Fully serverless deployment
-✔ Infrastructure as Code (IaC)
-✔ Local testing using SAM CLI
-✔ API Gateway integration
-✔ CloudWatch log monitoring
+- Event-driven architecture
+- Fully serverless deployment
+- Infrastructure as Code (IaC)
+- Local testing using SAM CLI
+- API Gateway integration
+- CloudWatch log monitoring
 
 ## Deployment
 Build the application:
