@@ -13,9 +13,8 @@ def lambda_handler(event, context):
 
     with open("raw_orders.csv", "r") as file:
         reader = csv.DictReader(file)
-
-    for row in reader:
-        print(row)
+        for row in reader:
+            print(row)
 
     print(bucket)
     print(key)
