@@ -27,7 +27,7 @@ Resources:
           Type: S3
           Properties:
             Bucket: sreenath-v1
-            Events: s3:ObjectCreated:Put
+            Events: s3:ObjectCreated:Put,Post
             Filter:
               S3Key:
                 Rules:
