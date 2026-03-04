@@ -1,5 +1,5 @@
 import json
-
+import csv
 # import requests
 
 
@@ -28,6 +28,15 @@ def lambda_handler(event, context):
 
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = event['Records'][0]['s3']['object']['key']
+
+
+
+    with open("employees.csv", "r") as file:
+        reader = csv.DictReader(file)
+
+    for row in reader:
+        print(row)
+
     print(bucket)
     print(key)
 
