@@ -27,7 +27,7 @@
           "arn": "arn:aws:s3:::sreenath-v1"
         },
         "object": {
-          "key": "raw_data/employees_21.csv",
+          "key": "raw_data/raw_orders.csv",
           "size": 141,
           "eTag": "299a3f719397cde391d3ef54d5891e53",
           "sequencer": "0069A47E3FF068B258"
