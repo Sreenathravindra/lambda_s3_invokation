@@ -241,4 +241,20 @@ $RECYCLE.BIN/
 
 */build/*
 
+# AWS SAM build artifacts
+.aws-sam/
+
+# SAM dependency cache
+deps/
+
+# Python compiled cache
+__pycache__/
+*.pyc
+
+# Lambda build output
+build/
+
+# Logs
+*.log
+
 # End of https://www.gitignore.io/api/osx,linux,python,windows,pycharm,visualstudiocode
