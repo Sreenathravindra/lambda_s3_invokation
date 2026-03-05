@@ -21,6 +21,7 @@ def lambda_handler(event, context):
     for row in reader:
         print(row)
 
+
     return {
         "statusCode": 200,
         "body": json.dumps({
