@@ -3,19 +3,34 @@ import csv
 import boto3
 import io
 import logging
-from validation import validate_row
+from datetime import datetime
 
-# Logger configuration
+from validation import validate_row
+from transform import transform_row
+
+# Logger
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 s3 = boto3.client("s3")
 
 
+def convert_to_csv(rows):
+    """Convert list of dicts to CSV string"""
+
+    if not rows:
+        return ""
+
+    output = io.StringIO()
+
+    writer = csv.DictWriter(output, fieldnames=rows[0].keys())
+    writer.writeheader()
+    writer.writerows(rows)
+
+    return output.getvalue()
+
+
 def lambda_handler(event, context):
-    """
-    Entry point for Lambda triggered by S3 event
-    """
 
     logger.info("Lambda triggered with event: %s", json.dumps(event))
 
@@ -53,13 +68,42 @@ def lambda_handler(event, context):
             if errors:
                 row["errors"] = errors
                 invalid_rows.append(row)
+
             else:
+                row = transform_row(row)
                 valid_rows.append(row)
 
         except Exception as e:
-            logger.error("Unexpected error while validating row %s: %s", row, str(e))
+            logger.error("Unexpected error while processing row %s: %s", row, str(e))
             row["errors"] = ["Unexpected validation error"]
             invalid_rows.append(row)
+
+    # Generate timestamp to avoid overwrite
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    # Upload valid rows
+    if valid_rows:
+
+        valid_csv = convert_to_csv(valid_rows)
+
+        s3.put_object(
+            Bucket=bucket,
+            Key=f"processed/valid/orders_{timestamp}.csv",
+            Body=valid_csv,
+            ContentType="text/csv"
+        )
+
+    # Upload invalid rows
+    if invalid_rows:
+
+        invalid_csv = convert_to_csv(invalid_rows)
+
+        s3.put_object(
+            Bucket=bucket,
+            Key=f"quarantine/invalid/orders_{timestamp}.csv",
+            Body=invalid_csv,
+            ContentType="text/csv"
+        )
 
     logger.info("Processing completed")
     logger.info("Total records: %s", total_records)
