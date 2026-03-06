@@ -8,22 +8,18 @@ The infrastructure is deployed using AWS SAM (Serverless Application Model) enab
 
 ## Architecture
 
-S3 (Raw CSV Data)
-        │
-        ▼
-AWS Lambda
-(Validation + Transformation)
-        │
-        ▼
-Processed Data in S3
-   ├── processed/valid/
-   └── quarantine/invalid/
-        │
-        ▼
-AWS Glue (Future Batch Processing)
-        │
-        ▼
-Analytics / Data Warehouse
+```mermaid
+flowchart TD
+    A[Amazon S3 Raw CSV Data] --> B[AWS Lambda Validation & Transformation]
+    B --> C[Amazon S3 Processed Data]
+
+    C --> D[processed/valid]
+    C --> E[quarantine/invalid]
+
+    C --> F[AWS Glue Future ETL]
+    F --> G[Analytics / Data Warehouse - Redshift]
+```
+
 
 ## Problem Statement
 
@@ -95,21 +91,14 @@ This project uses GitHub Actions for automated CI/CD deployment.
 
 Whenever code is pushed to the main branch, the pipeline automatically builds and deploys the Lambda application using AWS SAM.
 
-# CI/CD Workflow
+## CI/CD Workflow
 
-Developer Push Code
-        ↓
-GitHub Repository
-        ↓
-GitHub Actions Workflow
-        ↓
-SAM Build
-        ↓
-SAM Deploy
-        ↓
-AWS CloudFormation
-        ↓
-Lambda Function Updated
+1. Developer pushes code to the GitHub repository
+2. GitHub Actions workflow is triggered
+3. AWS SAM build process runs
+4. AWS SAM deploy updates the infrastructure
+5. AWS CloudFormation provisions or updates resources
+6. AWS Lambda function is updated
 
 # Workflow Steps
 
@@ -136,6 +125,7 @@ The workflow configuration is stored in:
 sam build --use-container
 # Deploy the application
 sam deploy --guided
+
 # Local Testing
 
 Invoke Lambda locally using an S3 event:
@@ -146,20 +136,8 @@ You can also simulate API calls using:
 
 sam local start-api
 
-## Project Structure
-
-lambda_s3_invokation
-
-├── app.py                # Lambda entry point
-├── validation.py         # Data validation logic
-├── transform.py          # Data transformation logic
-├── events/
-│   └── event.json        # Sample S3 trigger event
-├── template.yaml         # SAM infrastructure template
-├── requirements.txt
-├── README.md
-
 ## Example Data Flow
+
 # Raw Input
 raw_data/raw_orders.csv
 
