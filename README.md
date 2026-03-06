@@ -26,11 +26,8 @@ flowchart TD
 Organizations often receive large volumes of raw data that may contain:
 
 - Duplicate records
-
 - Invalid numeric values
-
 - Missing fields
-
 - Incorrect data formats
 
 Manually cleaning this data is inefficient and error-prone.
@@ -38,11 +35,8 @@ Manually cleaning this data is inefficient and error-prone.
 This project implements a serverless automated pipeline that:
 
 - Automatically processes uploaded CSV files
-
 - Validates and cleans incoming data
-
 - Separates valid and invalid records
-
 - Stores structured data for further analytics processing
 
 ## Tech Stack
@@ -105,36 +99,30 @@ Whenever code is pushed to the main branch, the pipeline automatically builds an
 The CI/CD pipeline performs the following steps:
 
 Checkout repository
-
 Setup Python environment
-
 Install AWS SAM CLI
-
 Configure AWS credentials using GitHub Secrets
-
 Build application using sam build
-
 Deploy infrastructure using sam deploy
-
 The workflow configuration is stored in:
-.github/workflows/deploy.yml
+ - .github/workflows/deploy.yml
 
 ## Deployment
 
 # Build the application
-sam build --use-container
+- sam build --use-container
 # Deploy the application
-sam deploy --guided
+- sam deploy --guided
 
 # Local Testing
 
 Invoke Lambda locally using an S3 event:
 
-sam local invoke -e events/event.json
+- sam local invoke -e events/event.json
 
 You can also simulate API calls using:
 
-sam local start-api
+- sam local start-api
 
 ## Example Data Flow
 
@@ -151,11 +139,11 @@ order_id,customer_name,email,order_date,amount,product,quantity,city
 
 Valid records:
 
-processed/valid/orders_2026_03_06.csv
+- processed/valid/orders_2026_03_06.csv
 
 Invalid records:
 
-quarantine/invalid/orders_2026_03_06.csv
+- quarantine/invalid/orders_2026_03_06.csv
 
 ## Key Learnings
 
