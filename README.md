@@ -99,11 +99,17 @@ Whenever code is pushed to the main branch, the pipeline automatically builds an
 The CI/CD pipeline performs the following steps:
 
 Checkout repository
+
 Setup Python environment
+
 Install AWS SAM CLI
+
 Configure AWS credentials using GitHub Secrets
+
 Build application using sam build
+
 Deploy infrastructure using sam deploy
+
 The workflow configuration is stored in:
  - .github/workflows/deploy.yml
 
