@@ -6,7 +6,7 @@ import logging
 from datetime import datetime
 
 from validation import validate_row
-from transform import transform_row
+
 
 # Logger
 logger = logging.getLogger()
@@ -70,7 +70,7 @@ def lambda_handler(event, context):
                 invalid_rows.append(row)
 
             else:
-                row = transform_row(row)
+
                 valid_rows.append(row)
 
         except Exception as e:

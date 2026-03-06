@@ -2,7 +2,7 @@
 # Project Overview
 This project implements an event-driven serverless data processing pipeline using AWS services.
 
-When a CSV file containing order data is uploaded to Amazon S3, an AWS Lambda function is automatically triggered. The Lambda function performs data validation and transformation, then stores the processed output into structured S3 folders for downstream batch processing.
+When a CSV file containing order data is uploaded to Amazon S3, an AWS Lambda function is automatically triggered. The Lambda function performs data validation, then stores the processed output into structured S3 folders for downstream batch processing.
 
 The infrastructure is deployed using AWS SAM (Serverless Application Model) enabling Infrastructure as Code (IaC).
 
@@ -10,7 +10,7 @@ The infrastructure is deployed using AWS SAM (Serverless Application Model) enab
 
 ```mermaid
 flowchart TD
-    A[Amazon S3 Raw CSV Data] --> B[AWS Lambda Validation & Transformation]
+    A[Amazon S3 Raw CSV Data] --> B[AWS Lambda Validation]
     B --> C[Amazon S3 Processed Data]
 
     C --> D[processed/valid]
@@ -61,13 +61,6 @@ Duplicate order_id
 Numeric values for amount
 Positive transaction values
 Missing or invalid fields
-
-# Data Transformation
-Valid records are transformed:
-Convert numeric fields to proper types
-Normalize product names
-Clean whitespace from fields
-Standardize schema
 
 # Data Segregation
 Output data is stored in separate S3 folders:
