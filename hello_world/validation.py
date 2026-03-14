@@ -9,10 +9,11 @@ def validate_row(row, seen_ids):
 
     errors = []
 
-    order_id = row.get("order_id")
-    price = row.get("price")
-    quantity = row.get("quantity")
-    timestamp = row.get("order_timestamp")
+    # Clean values (important!)
+    order_id = (row.get("order_id") or "").strip()
+    price = (row.get("price") or "").strip()
+    quantity = (row.get("quantity") or "").strip()
+    timestamp = (row.get("order_timestamp") or "").strip()
 
     # Validate order_id
     if not order_id:
