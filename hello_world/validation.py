@@ -12,14 +12,9 @@ def validate_row(row, seen_ids):
     order_id = row.get("order_id")
     price = row.get("price")
     quantity = row.get("quantity")
-    customer_id = row.get("customer_id")
-    product_id = row.get("product_id")
-    order_timestamp = row.get("order_timestamp")
+    timestamp = row.get("order_timestamp")
 
-    # -------------------------
     # Validate order_id
-    # -------------------------
-
     if not order_id:
         errors.append("Missing Order ID")
 
@@ -29,24 +24,7 @@ def validate_row(row, seen_ids):
     else:
         seen_ids.add(order_id)
 
-    # -------------------------
-    # Validate customer_id
-    # -------------------------
-
-    if not customer_id:
-        errors.append("Missing Customer ID")
-
-    # -------------------------
-    # Validate product_id
-    # -------------------------
-
-    if not product_id:
-        errors.append("Missing Product ID")
-
-    # -------------------------
     # Validate price
-    # -------------------------
-
     try:
         price_val = float(price)
 
@@ -56,10 +34,7 @@ def validate_row(row, seen_ids):
     except (ValueError, TypeError):
         errors.append("Price Not Numeric")
 
-    # -------------------------
     # Validate quantity
-    # -------------------------
-
     try:
         quantity_val = int(quantity)
 
@@ -69,21 +44,14 @@ def validate_row(row, seen_ids):
     except (ValueError, TypeError):
         errors.append("Quantity Not Numeric")
 
-    # -------------------------
     # Validate timestamp
-    # -------------------------
-
     try:
-        datetime.strptime(order_timestamp, "%d-%m-%Y %H:%M")
+        datetime.strptime(timestamp, "%d-%m-%Y %H:%M")
 
     except Exception:
-        errors.append("Invalid Order Timestamp")
-
-    # -------------------------
-    # Log validation errors
-    # -------------------------
+        errors.append("Invalid Timestamp")
 
     if errors:
-        logger.debug(f"Validation errors for row {row}: {errors}")
+        logger.debug("Validation errors for row %s : %s", row, errors)
 
     return errors
