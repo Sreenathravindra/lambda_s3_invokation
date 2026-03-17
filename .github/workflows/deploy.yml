@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'hello_world/**'
 
 jobs:
   deploy:
