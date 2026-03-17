@@ -1,12 +1,16 @@
-## Serverless Data Processing Pipeline using AWS Lambda, S3 and SAM
-# Project Overview
-This project implements an event-driven serverless data processing pipeline using AWS services.
+# Serverless Data Processing Pipeline (AWS Lambda + S3 + SAM)
 
-When a CSV file containing order data is uploaded to Amazon S3, an AWS Lambda function is automatically triggered. The Lambda function performs data validation, then stores the processed output into structured S3 folders for downstream batch processing.
+## Overview
 
-The infrastructure is deployed using AWS SAM (Serverless Application Model) enabling Infrastructure as Code (IaC).
+This project implements an **event-driven serverless data processing pipeline** using AWS services.
 
-## Architecture
+When a CSV file containing order data is uploaded to **Amazon S3**, an **AWS Lambda function** is automatically triggered to validate and process the data. Valid and invalid records are separated and stored in structured S3 folders for downstream analytics and ETL pipelines.
+
+Infrastructure is deployed using **AWS SAM (Serverless Application Model)** enabling **Infrastructure as Code (IaC)**.
+
+---
+
+# Architecture
 
 ```mermaid
 flowchart TD
@@ -20,8 +24,18 @@ flowchart TD
     F --> G[Analytics / Data Warehouse - Redshift]
 ```
 
+### Architecture Explanation
 
-## Problem Statement
+1. Raw CSV files are uploaded to **Amazon S3**
+2. S3 triggers an **AWS Lambda function**
+3. Lambda validates incoming records
+4. Valid records are stored in `processed/valid`
+5. Invalid records are stored in `quarantine/invalid`
+6. Clean data becomes available for downstream **ETL pipelines and analytics**
+
+---
+
+# Problem Statement
 
 Organizations often receive large volumes of raw data that may contain:
 
@@ -32,148 +46,231 @@ Organizations often receive large volumes of raw data that may contain:
 
 Manually cleaning this data is inefficient and error-prone.
 
-This project implements a serverless automated pipeline that:
+This project implements an automated **serverless validation pipeline** that processes data immediately when files arrive.
 
-- Automatically processes uploaded CSV files
-- Validates and cleans incoming data
-- Separates valid and invalid records
-- Stores structured data for further analytics processing
+---
 
-## Tech Stack
+# Key Features
 
-- AWS Lambda – Serverless compute for data processing
-- Amazon S3 – Data ingestion and storage
-- AWS SAM – Infrastructure as Code
-- AWS CloudFormation – Infrastructure provisioning
-- AWS Glue (Planned) – Batch ETL processing
-- Python – Data validation and transformation
-- Docker – Local Lambda testing
-- GitHub Actions – CI/CD pipeline automation
+### Event-Driven Processing
+Files uploaded to S3 automatically trigger the Lambda function.
 
-## Features
+### Data Validation
 
-# Event-Driven Processing
-Files uploaded to S3 automatically trigger a Lambda function.
-
-# Data Validation
 The pipeline validates:
-Duplicate order_id
-Numeric values for amount
-Positive transaction values
-Missing or invalid fields
 
-# Data Segregation
+- Duplicate `order_id`
+- Numeric values for `amount`
+- Positive transaction values
+- Missing or invalid fields
+
+### Data Segregation
+
 Output data is stored in separate S3 folders:
+
+```
 processed/
    valid/
+
 quarantine/
    invalid/
-# Local Development & Testing
-Developers can run Lambda locally using AWS SAM CLI.
+```
 
+### Infrastructure as Code
 
-## CI/CD Pipeline (GitHub Actions)
+Infrastructure is deployed using **AWS SAM**, enabling reproducible deployments.
 
-This project uses GitHub Actions for automated CI/CD deployment.
+### Local Development
 
-Whenever code is pushed to the main branch, the pipeline automatically builds and deploys the Lambda application using AWS SAM.
+Developers can run Lambda locally using **AWS SAM CLI and Docker**.
 
-## CI/CD Workflow
+---
 
-1. Developer pushes code to the GitHub repository
-2. GitHub Actions workflow is triggered
-3. AWS SAM build process runs
-4. AWS SAM deploy updates the infrastructure
-5. AWS CloudFormation provisions or updates resources
-6. AWS Lambda function is updated
+# Tech Stack
 
-# Workflow Steps
+| Technology | Purpose |
+|---|---|
+| AWS Lambda | Serverless compute for data processing |
+| Amazon S3 | Data ingestion and storage |
+| AWS SAM | Infrastructure as Code |
+| AWS CloudFormation | Infrastructure provisioning |
+| Python | Data validation and transformation |
+| Docker | Local Lambda testing |
+| GitHub Actions | CI/CD automation |
+| AWS Glue (Future) | Batch ETL processing |
 
-The CI/CD pipeline performs the following steps:
+---
 
-Checkout repository
+# Project Structure
 
-Setup Python environment
+```
+lambda-s3-data-validation-pipeline
+│
+├── .github/
+│   └── workflows/
+│       └── deploy.yml            # CI/CD pipeline for SAM deployment
+│
+├── events/
+│   └── event.json                # Sample S3 event for local testing
+│
+├── hello_world/
+│   ├── __init__.py
+│   ├── app.py                    # Lambda entry point
+│   ├── validation.py             # Data validation logic
+│   └── requirements.txt          # Python dependencies
+│
+├── tests/
+│   ├── integration/
+│   │   ├── __init__.py
+│   │   └── test_api_gateway.py
+│   │
+│   └── unit/
+│       ├── __init__.py
+│       ├── test_handler.py
+│       └── requirements.txt
+│
+├── template.yaml                 # AWS SAM infrastructure template
+├── samconfig.toml                # SAM deployment configuration
+├── README.md
+└── .gitignore
+```
 
-Install AWS SAM CLI
+---
 
-Configure AWS credentials using GitHub Secrets
+# Example Data Flow
 
-Build application using sam build
+### Raw Input
 
-Deploy infrastructure using sam deploy
+```
+raw_data/raw_orders.csv
+```
 
-The workflow configuration is stored in:
- - .github/workflows/deploy.yml
+Example record
 
-## Deployment
+```
+order_id,customer_name,email,order_date,amount,product,quantity,city
+1005,Amit Kumar,amit@gmail.com,23-02-2025,700,Mouse,1,Chennai
+```
 
-# Build the application
-- sam build --use-container
-# Deploy the application
-- sam deploy --guided
+### Processed Output
+
+Valid records
+
+```
+processed/valid/orders_2026_03_06.csv
+```
+
+Invalid records
+
+```
+quarantine/invalid/orders_2026_03_06.csv
+```
+
+---
+
+# CI/CD Pipeline (GitHub Actions)
+
+This project uses **GitHub Actions** for automated CI/CD deployment.
+
+Whenever code is pushed to the `main` branch:
+
+1. GitHub Actions workflow is triggered
+2. AWS SAM build process runs
+3. AWS SAM deploy updates the infrastructure
+4. AWS CloudFormation provisions or updates resources
+5. AWS Lambda function is updated
+
+Workflow file:
+
+```
+.github/workflows/deploy.yml
+```
+
+---
+
+# Deployment
+
+Build the application
+
+```
+sam build --use-container
+```
+
+Deploy infrastructure
+
+```
+sam deploy --guided
+```
+
+---
 
 # Local Testing
 
 Invoke Lambda locally using an S3 event:
 
-- sam local invoke -e events/event.json
+```
+sam local invoke -e events/event.json
+```
 
-You can also simulate API calls using:
+Start local API simulation:
 
-- sam local start-api
+```
+sam local start-api
+```
 
-## Example Data Flow
+---
 
-# Raw Input
-raw_data/raw_orders.csv
+# Testing
 
+Run unit tests
 
-Example record:
+```
+pytest tests/unit
+```
 
-order_id,customer_name,email,order_date,amount,product,quantity,city
-1005,Amit Kumar,amit@gmail.com,23-02-2025,700,Mouse,1,Chennai
+Run integration tests
 
-# Processed Output
+```
+pytest tests/integration
+```
 
-Valid records:
+---
 
-- processed/valid/orders_2026_03_06.csv
+# Key Learnings
 
-Invalid records:
+Through this project I gained hands-on experience with:
 
-- quarantine/invalid/orders_2026_03_06.csv
+- Designing **event-driven serverless architectures**
+- Implementing **data validation pipelines**
+- Using **AWS SAM for Infrastructure as Code**
+- Handling **S3 event triggers**
+- Writing production-ready **AWS Lambda functions**
+- Running Lambda locally using **Docker**
+- Automating deployments with **GitHub Actions**
 
-## Key Learnings
+---
 
-Through this project, I learned:
+# Roadmap (Future Enhancements)
 
-- Designing event-driven serverless architectures
-- Using AWS SAM for Infrastructure as Code
-- Implementing data validation pipelines
-- Handling S3 event triggers
-- Writing production-ready Lambda functions
-- Running Lambda locally using Docker
-- Automating deployments with GitHub Actions (CI/CD)
+This project will be extended into a complete **Data Engineering pipeline**:
 
-## Future Enhancements (Data Engineering Upgrade)
+- Convert processed data to **Parquet format**
+- Partition data for **Athena query optimization**
+- Integrate **AWS Glue ETL jobs**
+- Implement **Data Lake architecture (Bronze / Silver / Gold layers)**
+- Add automated **data quality monitoring**
+- Integrate **AWS Athena for analytics queries**
 
-This project will be extended into a complete data engineering pipeline:
+---
 
-- Convert processed data to Parquet format for efficient storage and querying
-- Partition data to optimize AWS Athena query performance
-- Integrate AWS Glue ETL jobs for large-scale data processing
-- Implement a Data Lake architecture (Bronze / Silver / Gold layers)
-- Add automated data quality monitoring and validation checks
-- Integrate AWS Athena for analytics and ad-hoc queries
+# Author
 
-## Why This Project Matters
+**R Sreenath**
 
-This project demonstrates key Data Engineering concepts:
+AWS Data Engineer
 
-- Event-driven data ingestion
-- Serverless architecture
-- Data validation pipelines
-- Cloud-native ETL design
-- Infrastructure as Code (IaC)
-- CI/CD automation
+GitHub  
+https://github.com/Sreenathravindra
+
+LinkedIn  
+https://www.linkedin.com/in/r-sreenath-9190b2256
